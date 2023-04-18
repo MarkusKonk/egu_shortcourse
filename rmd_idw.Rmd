@@ -1,0 +1,100 @@
+---
+title: "EGU shortcourse: Communicating data quality through open reproducible research"
+author: 
+- affiliation:  "52°North Spatial Information Research GmbH"
+  name: "Markus Konkol"
+- affiliation:  "52°North Spatial Information Research GmbH"
+  name: "Simon Jirka"
+date: "2023-04-25"
+licenses:
+  code: Apache License 2.0
+  data: CC0
+  text: CC-BY-4.0
+output: html_document
+abstract: ""
+params:
+  checked: TRUE
+  accuracy: 0.2
+  idwPower: 2.0
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import libraries and source code scripts
+```{r importLibraries, warning=FALSE, message=FALSE}
+library(tmap)
+library(sp)
+library(RColorBrewer)
+library(gstat)
+library(raster)
+library(geojsonio)
+
+source("code/functions.R")
+source("code/plotFunctions.R")
+```
+
+Import dataset
+```{r importData, warning=FALSE}
+temperature_values <- read.csv(file="data/temperature_values.csv", sep = ';', header = TRUE)
+```
+
+Filter dataset according to parameters in YAML.
+```{r}
+param <- params$checked
+param
+if (params$checked) {
+  temperature_values <- dplyr::filter(temperature_values, temperature_values$quality_level == "checked")  
+}
+
+temperature_values <- dplyr::filter(temperature_values, temperature_values$accuracy < params$accuracy)
+
+```
+
+
+Create _SpatialPointsDataFrame_
+```{r createSPDF, warning=FALSE, message=FALSE}
+coord_ref_sys <- CRS("+init=epsg:4326 +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+points_spdf <- createSpatialPointsDataFrame(temperature_values$longitude, 
+                                          temperature_values$latitude, 
+                                          temperature_values, 
+                                          coord_ref_sys)
+```
+
+Create _SpatialPolygonsDataFrame_
+```{r createSPolyDF, warning=FALSE, message=FALSE}
+lake <- geojson_read("data/lake_aasee.geojson")
+lake_spolydf <- createSpatialPolygonsDataFrame(lake, coord_ref_sys)
+```
+
+Align the bounding boxes of the observations and the study area.
+```{r alignBBX, warning=FALSE, message=FALSE}
+points_spdf@bbox <- lake_spolydf@bbox
+```
+
+Plot study area
+```{r studyArea, warning=FALSE, message=FALSE}
+studyarea <- plotStudyArea(lake_spolydf, points_spdf)
+studyarea
+
+jpeg("figures/studyarea.jpg")
+studyarea
+dev.off()
+```
+
+Run and plot interpolation
+```{r interpolate, warning=FALSE, message=FALSE}
+points_spdf.idw <- runInterpolation(points_spdf, temperature_values$value, params$idwPower)
+
+raster_object       <- raster(points_spdf.idw)
+raster_object.mask  <- mask(raster_object, lake_spolydf)
+
+idw <- plotInterpolationMap(raster_object.mask, points_spdf)
+idw
+
+jpeg("figures/idw.jpg")
+idw
+dev.off()
+```
+
