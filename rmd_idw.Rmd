@@ -13,17 +13,18 @@ licenses:
 output: html_document
 abstract: ""
 params:
-  checked: TRUE
+  checked: FALSE
   accuracy: 0.2
   idwPower: 2.0
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#Some global parameters for the chunks in this Rmd. Other options: include, warning, message
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-Import libraries and source code scripts
-```{r importLibraries, warning=FALSE, message=FALSE}
+Import libraries and source code scripts. Outsourcing code snippets to some R files allows to keep the R Markdown file light.
+```{r importLibraries}
 library(tmap)
 library(sp)
 library(RColorBrewer)
@@ -35,13 +36,13 @@ source("code/functions.R")
 source("code/plotFunctions.R")
 ```
 
-Import dataset
-```{r importData, warning=FALSE}
+Import dataset.
+```{r importData}
 temperature_values <- read.csv(file="data/temperature_values.csv", sep = ';', header = TRUE)
 ```
 
-Filter dataset according to parameters in YAML.
-```{r}
+Filter dataset according to parameters in YAML. Here, "checked" indicates that a sensor which made an observation was checked and calibrated. 
+```{r filterData}
 param <- params$checked
 param
 if (params$checked) {
@@ -54,7 +55,7 @@ temperature_values <- dplyr::filter(temperature_values, temperature_values$accur
 
 
 Create _SpatialPointsDataFrame_
-```{r createSPDF, warning=FALSE, message=FALSE}
+```{r createSPDF}
 coord_ref_sys <- CRS("+init=epsg:4326 +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 points_spdf <- createSpatialPointsDataFrame(temperature_values$longitude, 
                                           temperature_values$latitude, 
@@ -63,18 +64,18 @@ points_spdf <- createSpatialPointsDataFrame(temperature_values$longitude,
 ```
 
 Create _SpatialPolygonsDataFrame_
-```{r createSPolyDF, warning=FALSE, message=FALSE}
+```{r createSPolyDF}
 lake <- geojson_read("data/lake_aasee.geojson")
 lake_spolydf <- createSpatialPolygonsDataFrame(lake, coord_ref_sys)
 ```
 
 Align the bounding boxes of the observations and the study area.
-```{r alignBBX, warning=FALSE, message=FALSE}
+```{r alignBBX}
 points_spdf@bbox <- lake_spolydf@bbox
 ```
 
 Plot study area
-```{r studyArea, warning=FALSE, message=FALSE}
+```{r studyArea, results = 'hide'}
 studyarea <- plotStudyArea(lake_spolydf, points_spdf)
 studyarea
 
