@@ -22,6 +22,7 @@ bibliography: references.bib
 ```{r setup, include=FALSE}
 #Some global parameters for the chunks in this Rmd. Other options: include, warning, message
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+#sessionInfo()
 ```
 
 Import libraries and source code scripts. Outsourcing code snippets to some R files allows to keep the R Markdown file light.
