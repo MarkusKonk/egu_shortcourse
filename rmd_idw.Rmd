@@ -1,5 +1,5 @@
 ---
-title: "EGU shortcourse: Communicating data quality through open reproducible research"
+title: "EGU short course: Communicating data quality through open reproducible research"
 author: 
 - affiliation:  "52°North Spatial Information Research GmbH"
   name: "Markus Konkol"
@@ -11,11 +11,12 @@ licenses:
   data: CC0
   text: CC-BY-4.0
 output: html_document
-abstract: ""
+abstract: "This R Markdown files creates a simple IDW interpolation based on an artificial dataset."
 params:
   checked: FALSE
   accuracy: 0.2
   idwPower: 2.0
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +25,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 Import libraries and source code scripts. Outsourcing code snippets to some R files allows to keep the R Markdown file light.
-```{r importLibraries}
+```{r importLibraries, echo = FALSE}
 library(tmap)
 library(sp)
 library(RColorBrewer)
@@ -36,12 +37,25 @@ source("code/functions.R")
 source("code/plotFunctions.R")
 ```
 
+tmap by @tmap
+
+sp by @sp
+
+RColorBrewer by @rcb
+
+gstat by @gstat
+
+raster by @raster
+
+geojsonio by @gjio
+
 Import dataset.
 ```{r importData}
 temperature_values <- read.csv(file="data/temperature_values.csv", sep = ';', header = TRUE)
 ```
 
 Filter dataset according to parameters in YAML. Here, "checked" indicates that a sensor which made an observation was checked and calibrated. 
+
 ```{r filterData}
 param <- params$checked
 param
@@ -85,7 +99,7 @@ dev.off()
 ```
 
 Run and plot interpolation
-```{r interpolate, warning=FALSE, message=FALSE}
+```{r interpolate}
 points_spdf.idw <- runInterpolation(points_spdf, temperature_values$value, params$idwPower)
 
 raster_object       <- raster(points_spdf.idw)
@@ -99,3 +113,4 @@ idw
 dev.off()
 ```
 
+## References
