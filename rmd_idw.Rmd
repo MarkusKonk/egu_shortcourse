@@ -13,7 +13,7 @@ licenses:
 output: html_document
 abstract: "This R Markdown files creates a simple IDW interpolation based on an artificial dataset."
 params:
-  checked: FALSE
+  checked: FALSE #ausreisser
   accuracy: 0.2
   idwPower: 2.0
   adjusted: null  
@@ -65,7 +65,6 @@ if (params$checked) {
 }
 
 temperature_values <- dplyr::filter(temperature_values, temperature_values$accuracy < params$accuracy)
-params$adjusted
 ```
 
 Create _SpatialPointsDataFrame_
@@ -112,36 +111,39 @@ jpeg("figures/idw.jpg")
 idw
 dev.off()
 ```
-Create a IDW map with temperature variation measurements coming from the normal distribution using the accuracy as a standard deviation. Every run will result in a different map. However, potentially very small changes should be visible.
+Create a IDW map with temperature variation measurements coming from the normal distribution using the accuracy as a standard deviation. Every run will result in a different set of maps in the figures folder. The maps will differ only slightly.
 ```{r uncertainty}
 sample = generateAccuracyValues(points_spdf$measurement)
-points_spdf$var1 <- sample[,1]
-points_spdf$var2 <- sample[,2]
-points_spdf$var3 <- sample[,3]
-points_spdf$var4 <- sample[,4]
-points_spdf$var5 <- sample[,5]
-points_spdf$var6 <- sample[,6]
-points_spdf$var7 <- sample[,7]
-points_spdf$var8 <- sample[,8]
-points_spdf$var9 <- sample[,9]
-points_spdf$var10 <- sample[,10]
-#print(cbind(points_spdf$var1, points_spdf$var2, points_spdf$var3, points_spdf$var4, 
-#            points_spdf$var5, points_spdf$var6, points_spdf$var7, points_spdf$var8,
-#            points_spdf$var9, points_spdf$var10))
+measurement_variations_columns <- paste("points_spdf$var", 1:10, sep="")
+sample_supset <- paste("sample[,",1:10,"]", sep="")
+mergeCol <- paste(paste(measurement_variations_columns, sample_supset, sep="<-"), collapse=";")
+eval(parse(text=mergeCol))
 
-points_spdf.idw_var1 <- runInterpolation(points_spdf, points_spdf$var4, params$idwPower)
+interpolationVariables <- paste("points_spdf.idw_var", 1:10, sep="")
+interpolationRuns <- paste("runInterpolation(points_spdf, points_spdf$var",1:10,", params$idwPower)", sep="")
+merfeInterpolationVariablesRuns <- paste(paste(interpolationVariables, interpolationRuns, sep="<-"), collapse=";")
+eval(parse(text=merfeInterpolationVariablesRuns))
 
-raster_object_var1       <- raster(points_spdf.idw_var1)
-raster_object.mask_var1  <- mask(raster_object_var1, lake_spolydf)
+rasterVariables <- paste("raster_object_var", 1:10, sep="")
+rasterFunctions <- paste("raster(points_spdf.idw_var",1:10,")", sep="")
+mergeRasterVariablesFunctions <- paste(paste(rasterVariables, rasterFunctions, sep="<-"), collapse=";")
+eval(parse(text=mergeRasterVariablesFunctions))
 
-idw_var1 <- plotInterpolationMap(raster_object.mask_var1, points_spdf)
-idw_var1
+maskVariables <- paste("raster_object.mask_var", 1:10, sep="")
+maskFunctions <- paste("mask(raster_object_var",1:10,", lake_spolydf)", sep="")
+mergeMaskVariablesFunctions <- paste(paste(maskVariables, maskFunctions, sep="<-"), collapse=";")
+eval(parse(text=mergeMaskVariablesFunctions))
 
-jpeg("figures/idw_var1.jpg")
-idw_var1
-dev.off()
+plotVariables <- paste("idw_var", 1:10, sep="")
+plotFunctions <- paste("plotInterpolationMap(raster_object.mask_var",1:10,", points_spdf)", sep="")
+mergePlotVariablesFunctions <- paste(paste(plotVariables, plotFunctions, sep="<-"), collapse=";")
+eval(parse(text=mergePlotVariablesFunctions))
 
+for(i in 1:10) {
+  eval(parse(text = paste("png('figures/idw_var", i, ".png')", sep = "")))
+  eval(parse(text = paste("print(idw_var", i, ")", sep = "")))
+  dev.off()
+}
 ```
-
 
 ## References
