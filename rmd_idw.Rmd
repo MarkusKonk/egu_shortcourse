@@ -16,6 +16,7 @@ params:
   checked: FALSE
   accuracy: 0.2
   idwPower: 2.0
+  adjusted: null  
 bibliography: references.bib
 ---
 
@@ -59,15 +60,13 @@ Filter dataset according to parameters in YAML. Here, "checked" indicates that a
 
 ```{r filterData}
 param <- params$checked
-param
 if (params$checked) {
   temperature_values <- dplyr::filter(temperature_values, temperature_values$quality_level == "checked")  
 }
 
 temperature_values <- dplyr::filter(temperature_values, temperature_values$accuracy < params$accuracy)
-
+params$adjusted
 ```
-
 
 Create _SpatialPointsDataFrame_
 ```{r createSPDF}
@@ -101,7 +100,7 @@ dev.off()
 
 Run and plot interpolation
 ```{r interpolate}
-points_spdf.idw <- runInterpolation(points_spdf, temperature_values$value, params$idwPower)
+points_spdf.idw <- runInterpolation(points_spdf, temperature_values$measurement, params$idwPower)
 
 raster_object       <- raster(points_spdf.idw)
 raster_object.mask  <- mask(raster_object, lake_spolydf)
@@ -113,5 +112,36 @@ jpeg("figures/idw.jpg")
 idw
 dev.off()
 ```
+Create a IDW map with temperature variation measurements coming from the normal distribution using the accuracy as a standard deviation. Every run will result in a different map. However, potentially very small changes should be visible.
+```{r uncertainty}
+sample = generateAccuracyValues(points_spdf$measurement)
+points_spdf$var1 <- sample[,1]
+points_spdf$var2 <- sample[,2]
+points_spdf$var3 <- sample[,3]
+points_spdf$var4 <- sample[,4]
+points_spdf$var5 <- sample[,5]
+points_spdf$var6 <- sample[,6]
+points_spdf$var7 <- sample[,7]
+points_spdf$var8 <- sample[,8]
+points_spdf$var9 <- sample[,9]
+points_spdf$var10 <- sample[,10]
+#print(cbind(points_spdf$var1, points_spdf$var2, points_spdf$var3, points_spdf$var4, 
+#            points_spdf$var5, points_spdf$var6, points_spdf$var7, points_spdf$var8,
+#            points_spdf$var9, points_spdf$var10))
+
+points_spdf.idw_var1 <- runInterpolation(points_spdf, points_spdf$var4, params$idwPower)
+
+raster_object_var1       <- raster(points_spdf.idw_var1)
+raster_object.mask_var1  <- mask(raster_object_var1, lake_spolydf)
+
+idw_var1 <- plotInterpolationMap(raster_object.mask_var1, points_spdf)
+idw_var1
+
+jpeg("figures/idw_var1.jpg")
+idw_var1
+dev.off()
+
+```
+
 
 ## References

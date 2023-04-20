@@ -5,6 +5,11 @@
 This repository contains the materials for the [short course](https://meetingorganizer.copernicus.org/EGU23/session/46566) given at [EGU 2023](https://www.egu23.eu/).
 The idea is to demonstrate the use of reproducibility tools (R Markdown, GitHub, Binder, The Whole Tale) in the context of the [MINKE](https://minke.eu/) research project.
 
+### Installation guide
+
+Local: Clone repository, run install.R, run rmd_idw.Rmd.
+Cloud: Follow links below for running the code on Binder or The Whole Tale.
+
 ### Branches
 
 - __main__ contains a computational workflow to generate a map showing an interpolation and quality parameters to filter the underlying dataset. The structure of the repository is based on this [binder template](https://github.com/MarkusKonk/binder_template_rmarkdown).

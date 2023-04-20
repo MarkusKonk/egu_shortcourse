@@ -1,9 +1,9 @@
 plotStudyArea <- function(polygon, points){
   plot <- tm_shape(lake_spolydf) + tm_polygons() +
     tm_shape(points_spdf) +
-    tm_dots(col="value", palette = rev(brewer.pal(7, "RdBu")),
+    tm_dots(col="measurement", palette = rev(brewer.pal(7, "RdBu")),
             title="Sampled precipitation \n(in inches)", size=1) +
-    tm_text("value", just="left", xmod=.5, size = 0.7) +
+    tm_text("measurement", just="left", xmod=.5, size = 0.7) +
     tmap_options(check.and.fix = TRUE) +
     tm_legend(legend.outside=TRUE)
   return(plot)
@@ -17,3 +17,4 @@ plotInterpolationMap <- function(raster, points){
     tm_legend(legend.outside=TRUE)
   return(plot)
 }
+

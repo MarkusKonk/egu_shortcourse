@@ -39,3 +39,17 @@ runInterpolation <- function(points, values, interPolationPower){
   return(gstat::idw(values ~ 1, points, newdata=grd, idp=interPolationPower))
 }
 
+generateAccuracyValues <- function(values) {
+  matrix <- c()
+  for (value in values) {
+    #sample <- runif(n = 10, min = -0.002, max = 0.002)
+    samples <- rnorm(n = 10, mean = 0, sd = 0.002)
+    var1_10 <- c()
+    for (i in 1:10) {
+      val <- round(value + samples[i], digits = 3)
+      var1_10 <- append(var1_10, val)
+    }
+    matrix <- rbind(matrix, var1_10)
+  }
+  return(matrix)
+}
