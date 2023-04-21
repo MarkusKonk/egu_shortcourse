@@ -7,16 +7,16 @@ author:
   name: "Simon Jirka"
 date: "2023-04-25"
 licenses:
-  code: Apache License 2.0
+  code: MIT License
   data: CC0
   text: CC-BY-4.0
 output: html_document
 abstract: "This R Markdown files creates a simple IDW interpolation based on an artificial dataset."
 params:
-  checked: FALSE #ausreisser
-  accuracy: 0.2
-  idwPower: 2.0
-  adjusted: null  
+  quality_level: FALSE #FALSE: checked/unchecked values considered, TRUE: only checked values considered. 
+  accuracy: 0.2 #only values from sensors with an accuracy smaller/equal to 0.2 considered.
+  idwPower: 2.0 #IDW interpolation power.
+  data_processing: FALSE #FALSE: adjusted/raw values considered, TRUE: only adjusted values considered.  
 bibliography: references.bib
 ---
 
@@ -59,8 +59,7 @@ temperature_values <- read.csv(file="data/temperature_values.csv", sep = ';', he
 Filter dataset according to parameters in YAML. Here, "checked" indicates that a sensor which made an observation was checked and calibrated. 
 
 ```{r filterData}
-param <- params$checked
-if (params$checked) {
+if (params$quality_level) {
   temperature_values <- dplyr::filter(temperature_values, temperature_values$quality_level == "checked")  
 }
 
@@ -92,7 +91,7 @@ Plot study area
 studyarea <- plotStudyArea(lake_spolydf, points_spdf)
 studyarea
 
-jpeg("figures/studyarea.jpg")
+png("figures/studyarea.png")
 studyarea
 dev.off()
 ```
@@ -107,7 +106,7 @@ raster_object.mask  <- mask(raster_object, lake_spolydf)
 idw <- plotInterpolationMap(raster_object.mask, points_spdf)
 idw
 
-jpeg("figures/idw.jpg")
+png("figures/idw.png")
 idw
 dev.off()
 ```
