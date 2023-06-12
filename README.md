@@ -26,7 +26,7 @@ Cloud: Follow links below for running the code on Binder or The Whole Tale.
 - Binder for __map1__: https://mybinder.org/v2/gh/MarkusKonk/egu_shortcourse.git/map1
 - Binder for __map2__: https://mybinder.org/v2/gh/MarkusKonk/egu_shortcourse.git/map2
 - Binder for __calc__: https://mybinder.org/v2/gh/MarkusKonk/egu_shortcourse.git/calc
-- Whole Tale for __map1__: tba
+- Whole Tale for __map1__: tba 
 - Whole Tale for __map2__: tba
 - Whole Tale for __calc__: tba
 - Whole Tale for __main__: tba
