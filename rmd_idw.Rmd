@@ -30,6 +30,7 @@ Import libraries and source code scripts. Outsourcing code snippets to some R fi
 ```{r importLibraries, echo = FALSE}
 library(tmap)
 library(sp)
+library(sf)
 library(RColorBrewer)
 library(gstat)
 library(raster)
@@ -68,7 +69,7 @@ temperature_values <- dplyr::filter(temperature_values, temperature_values$accur
 
 Create _SpatialPointsDataFrame_
 ```{r createSPDF}
-coord_ref_sys <- CRS("+init=epsg:4326 +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+coord_ref_sys <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 points_spdf <- createSpatialPointsDataFrame(temperature_values$longitude, 
                                           temperature_values$latitude, 
                                           temperature_values, 
